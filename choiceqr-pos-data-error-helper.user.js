@@ -48,7 +48,7 @@
      *             {productId} {groupName} {httpCode} + іменовані групи з regex.
      *  Перший збіг згори — виграє.
      * ─────────────────────────────────────────────────────────────── */
-    const RULES_URL = 'PASTE_URL_HERE';
+    const RULES_URL = 'https://raw.githubusercontent.com/Makson369/choiceqr-pos-error-helper/main/pos-error-rules.json';
 
     const RULES_TTL_MS = 5 * 60 * 1000; // свіжість кешу; кнопка ⟳ оновлює примусово
     const RULES_CACHE_KEY = 'cqr_err_rules_v1';

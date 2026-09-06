@@ -17,9 +17,8 @@ Tampermonkey-скрипт для сторінки
 ## Встановлення скрипта (одноразово)
 
 1. Tampermonkey → Create a new script → вставити вміст `choiceqr-pos-data-error-helper.user.js`.
-2. У рядку `const RULES_URL = 'PASTE_URL_HERE';` вставити raw-посилання на `pos-error-rules.json`
-   (напр. `https://raw.githubusercontent.com/<user>/<repo>/main/pos-error-rules.json`
-   або `https://gist.githubusercontent.com/<user>/<id>/raw/pos-error-rules.json`).
+2. `RULES_URL` уже вказує на
+   `https://raw.githubusercontent.com/Makson369/choiceqr-pos-error-helper/main/pos-error-rules.json`.
 3. Зберегти. Далі скрипт не чіпаємо ніколи.
 
 Скрипт кешує базу на 5 хв; кнопка **⟳** у шапці панелі оновлює негайно.
@@ -48,7 +47,9 @@ Tampermonkey-скрипт для сторінки
 
 1. Дописати обʼєкт у масив `RULES` у `gen-rules.js` (там зручні хелпери).
 2. `node gen-rules.js` — перегенерує `pos-error-rules.json` і `.csv`.
-3. Закомітити / оновити Gist — скрипт підхопить за ≤5 хв.
+3. `git commit -am "..." && git push` — скрипт підхопить за ≤5 хв (або по кнопці ⟳).
+
+(Це роблю я — від тебе потрібні лише «помилка → рішення».)
 
 ## Поточні правила
 

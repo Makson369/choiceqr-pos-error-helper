@@ -1,14 +1,12 @@
 ﻿match_code,match_message,match_regex,match_source,title,solution
-,product id is undefined,,Poster,Poster: pos-id страви не знайдено,"Poster не бачить у своїй системі pos-id страви (item_id: {itemId}).
+,product id is undefined,,Poster,Poster: pos-id страви не знайдено,"Poster не може знайти у своїй системі pos-id страви (item_id: {itemId}).
 
-1. В адмін-панелі Choice знайти страву, у якої pos-id починається на «{itemId}--NW».
-2. Функції → Інтеграції з POS-системою → «Меню» — завантажити вивантаження меню Poster.
-3. Через CTRL+F знайти цю страву у файлі, звірити pos-id:
-   • немає у вивантаженні — додати страву в Poster;
-   • pos-id інший — замінити pos-id у Choice на актуальний з файлу.
-4. Повторити замовлення.
+До позиції [назва позиції] вказано неактуальний POS ID.
+Має бути: [актуальний pos-id]
 
-Детальніше: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
+Посилання на позицію: [посилання]
+
+Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
 ,required modification missing,,Poster,Poster: не додано обовʼязковий модифікатор,"У страви (product_id: {productId}) є набір доповнень «{groupName}», але в Choice не доданий
 обовʼязковий (single) модифікатор — Poster не може обробити чек.
 

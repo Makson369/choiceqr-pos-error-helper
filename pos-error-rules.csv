@@ -1,4 +1,4 @@
-﻿match_code,match_message,match_regex,match_source,title,solution
+﻿match_code,match_message,match_regex,match_source,title,solution,docs
 ,product id is undefined,,Poster,Poster: pos-id страви не знайдено,"Poster не може знайти у своїй системі pos-id страви (item_id: {itemId}).
 
 До позиції [назва позиції] вказано неактуальний POS ID.
@@ -6,18 +6,11 @@
 
 Посилання на позицію: [посилання]
 
-Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
+Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",
 ,required modification missing,,Poster,Poster: не додано обовʼязковий модифікатор,"У страви (product_id: {productId}) є набір доповнень «{groupName}», але в Choice не доданий
-обовʼязковий (single) модифікатор — Poster не може обробити чек.
+обовʼязковий (single) модифікатор — тому Poster не може обробити чек.
 
-1. Функції → Інтеграції з POS-системою → «Меню» — завантажити вивантаження меню Poster.
-2. Через CTRL+F знайти страву, подивитися Options: (single) — обовʼязковий вибір,
-   (multiple) — множинний.
-3. У Choice → Меню відкрити набори доповнень цієї страви: додати відсутні (single)
-   і перемкнути набір у режим «Єдиний вибір».
-4. Повторити замовлення.
-
-Детальніше: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
+Ось це доповнення має бути обовʼязково до цієї позиції: [посилання на позицію з фото цього доповнення]",https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2
 ,product id is empty,,Poster,Poster: у страви немає pos-id,"У якоїсь страви в чеку немає pos-id або він доданий неправильно.
 
 1. Функції → Інтеграції з POS-системою → «Меню» — завантажити вивантаження меню Poster.
@@ -26,12 +19,12 @@
    (напр. «82--NW» → «82--NW-NOMOD»).
 4. Повторити замовлення.
 
-Детальніше: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
+Детальніше: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",
 ,cannot read properties of undefined (reading 'order'),,,Посилання не веде на конкретне замовлення,"У URL немає selectedOrderId, тому бекенд не може дістати order.
 
 1. Адмінка → Orders.
 2. Клікнути потрібне замовлення — у URL зʼявиться ?selectedOrderId=<id>.
-3. Скопіювати ПОВНИЙ URL і вставити у поле Order URL."
+3. Скопіювати ПОВНИЙ URL і вставити у поле Order URL.",
 ,,"Product\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?(?<name>.+?)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s*\((?<pid>[0-9a-f-]{20,})\)\s+is inactive",Syrve,Syrve: позиція вимкнена з продажу,"Позиція «{name}» зараз вимкнена з продажу в Syrve — її треба увімкнути.
 
 Syrve productId: {pid}
@@ -40,7 +33,7 @@ Syrve productId: {pid}
 2. Увімкнути її (прибрати зі стоп-листа / «виключено з меню»).
    Або — прибрати позицію з меню ChoiceQR / позначити недоступною.
 3. Синхронізувати меню ChoiceQR ↔ Syrve.
-4. Повторити замовлення."
+4. Повторити замовлення.",
 ,,"Cannot find fixed group modifiers\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<group>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s+in order item\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<item>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\(Id\s*=\s*(?<id>[0-9a-f-]{8,})\)",Syrve,Syrve: набір доповнень не привʼязаний до позиції,"Syrve повідомляє, що до позиції «{item}» у чеку додано доповнення «{group}»,
 але в системі Syrve цей набір доповнень до цієї позиції не доданий.
 
@@ -49,4 +42,4 @@ Syrve itemId: {id}
 Для вирішення потрібно одне з двох:
 • вимкнути доповнення «{group}» у цієї позиції в меню Choice;
 • або додати доповнення «{group}» до цієї позиції в Syrve.
-Далі — синхронізувати меню ChoiceQR ↔ Syrve і повторити замовлення."
+Далі — синхронізувати меню ChoiceQR ↔ Syrve і повторити замовлення.",

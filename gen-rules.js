@@ -32,19 +32,14 @@ const RULES = [
   {
     match: { message: 'required modification missing', source: 'Poster' },
     title: 'Poster: не додано обовʼязковий модифікатор',
-    solution: L(
-      'У страви (product_id: {productId}) є набір доповнень «{groupName}», але в Choice не доданий',
-      'обовʼязковий (single) модифікатор — Poster не може обробити чек.',
-      '',
-      '1. Функції → Інтеграції з POS-системою → «Меню» — завантажити вивантаження меню Poster.',
-      '2. Через CTRL+F знайти страву, подивитися Options: (single) — обовʼязковий вибір,',
-      '   (multiple) — множинний.',
-      '3. У Choice → Меню відкрити набори доповнень цієї страви: додати відсутні (single)',
-      '   і перемкнути набір у режим «Єдиний вибір».',
-      '4. Повторити замовлення.',
-      '',
-      'Детальніше: ' + NOTION
-    ),
+    solution: [
+      L(
+        'У страви (product_id: {productId}) є набір доповнень «{groupName}», але в Choice не доданий',
+        'обовʼязковий (single) модифікатор — тому Poster не може обробити чек.'
+      ),
+      'Ось це доповнення має бути обовʼязково до цієї позиції: [посилання на позицію з фото цього доповнення]',
+    ],
+    docs: NOTION,
   },
   {
     match: { message: 'product id is empty', source: 'Poster' },
@@ -114,7 +109,7 @@ const csvCell = (v) => {
   v = String(v == null ? '' : v);
   return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
 };
-const csvRows = [['match_code', 'match_message', 'match_regex', 'match_source', 'title', 'solution']];
+const csvRows = [['match_code', 'match_message', 'match_regex', 'match_source', 'title', 'solution', 'docs']];
 for (const r of RULES) {
   csvRows.push([
     r.match.code ?? '',
@@ -122,7 +117,8 @@ for (const r of RULES) {
     r.match.regex ?? '',
     r.match.source ?? '',
     r.title ?? '',
-    r.solution ?? '',
+    Array.isArray(r.solution) ? r.solution.join('\n\n') : r.solution ?? '', // у CSV — одне поле
+    r.docs ?? '',
   ]);
 }
 const BOM = String.fromCharCode(0xfeff);

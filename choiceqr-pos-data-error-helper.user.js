@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.1.0
+// @version      3.2.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -29,23 +29,29 @@
      *        {
      *          "match": { "message": "product id is empty", "source": "Poster" },
      *          "title": "…",
-     *          "solution": "рядок1\nрядок2 {itemId}"
+     *          "solution": "рядок1\nрядок2 {itemId}",       // одне поле для копіювання
+     *          "docs": "https://…"                          // (опц.) посилання-футер
      *        },
-     *        { "match": { "regex": "…(?<group>…)…" }, "title": "…", "solution": "…{group}…" }
+     *        {
+     *          "match": { "code": "209" },
+     *          "title": "…",
+     *          "solution": ["повідомлення 1 …", "повідомлення 2 …{groupName}"]  // кілька полів
+     *        }
      *      ]
      *    raw-посилання GitHub: https://raw.githubusercontent.com/<user>/<repo>/main/pos-error-rules.json
-     *    або Gist:            https://gist.githubusercontent.com/<user>/<id>/raw/pos-error-rules.json
      *
-     *  • CSV   — колонки match_code, match_message, match_regex, match_source, title, solution
-     *    (напр. опублікована Google-таблиця: …/pub?gid=0&single=true&output=csv)
+     *  • CSV   — колонки match_code, match_message, match_regex, match_source, title, solution[, docs]
+     *    (Google-таблиця: …/pub?gid=0&single=true&output=csv). У CSV solution — завжди одне поле.
      *
      *  ПОЛЯ match (усі опційні; правило спрацьовує, якщо збіглися ВСІ заповнені):
      *    code    — точний e.code ("32", "209", "ProductExludedFromMenu"…)
      *    message — підрядок тексту помилки (без урахування регістру)
      *    regex   — RegExp по тексту; іменовані групи (?<name>…) → підстановка {name}
      *    source  — точне джерело ("Poster" / "Syrve" / "HTTPError"…)
-     *  solution — \n = новий рядок; підстановки {code} {message} {source} {itemId}
+     *  solution — рядок АБО масив рядків (кожен = окреме поле з кнопкою «Копіювати»).
+     *             \n = новий рядок; підстановки {code} {message} {source} {itemId}
      *             {productId} {groupName} {httpCode} + іменовані групи з regex.
+     *  docs     — (опц.) URL, показується під полями як клікабельний футер.
      *  Перший збіг згори — виграє.
      * ─────────────────────────────────────────────────────────────── */
     const RULES_URL = 'https://raw.githubusercontent.com/Makson369/choiceqr-pos-error-helper/main/pos-error-rules.json';
@@ -116,17 +122,23 @@
         return r;
     }
 
-    // Нормалізує будь-який запис бази у внутрішній вид {code,msg,rx,src,title,solution}.
+    // Нормалізує запис бази у внутрішній вид.
+    // solution — рядок (одне поле для копіювання) АБО масив рядків (кілька полів).
     function toRule(o) {
+        const sol = Array.isArray(o.solution)
+            ? o.solution.map((x) => String(x ?? ''))
+            : String(o.solution ?? '');
         const rule = {
             code: String(o.code ?? '').trim(),
             msg: String(o.msg ?? '').trim(),
             rx: String(o.rx ?? '').trim(),
             src: String(o.src ?? '').trim(),
             title: String(o.title ?? '').trim(),
-            solution: String(o.solution ?? ''),
+            solution: sol,
+            docs: String(o.docs ?? '').trim(),
         };
-        if (!rule.title && !rule.solution) return null; // порожній
+        const hasSol = Array.isArray(sol) ? sol.some((x) => x.trim()) : sol.trim();
+        if (!rule.title && !hasSol) return null; // порожній
         if (!rule.code && !rule.msg && !rule.rx && !rule.src) return null; // без умов
         return compileRule(rule);
     }
@@ -144,19 +156,21 @@
                     src: m.source ?? m.src,
                     title: it && it.title,
                     solution: it && it.solution,
+                    docs: it && it.docs,
                 });
             })
             .filter(Boolean);
     }
 
-    // CSV з заголовком match_code,match_message,match_regex,match_source,title,solution
+    // CSV: match_code,match_message,match_regex,match_source,title,solution[,docs]
+    // (у CSV solution завжди одне поле; кілька полів для копіювання — лише у JSON)
     function rowsToRules(rows) {
         if (!rows.length) return [];
         const H = rows[0].map((h) => String(h).trim().toLowerCase());
         const at = (name) => H.indexOf(name);
         const ix = {
             code: at('match_code'), msg: at('match_message'), rx: at('match_regex'),
-            src: at('match_source'), title: at('title'), sol: at('solution'),
+            src: at('match_source'), title: at('title'), sol: at('solution'), docs: at('docs'),
         };
         const out = [];
         for (let i = 1; i < rows.length; i++) {
@@ -164,7 +178,7 @@
             const g = (k) => (ix[k] >= 0 ? String(r[ix[k]] ?? '') : '');
             const rule = toRule({
                 code: g('code'), msg: g('msg'), rx: g('rx'), src: g('src'),
-                title: g('title'), solution: g('sol'),
+                title: g('title'), solution: g('sol'), docs: g('docs'),
             });
             if (rule) out.push(rule);
         }
@@ -203,7 +217,7 @@
                         RULES_CACHE_KEY,
                         JSON.stringify({
                             ts: Date.now(),
-                            rules: rules.map((r) => ({ code: r.code, msg: r.msg, rx: r.rx, src: r.src, title: r.title, solution: r.solution })),
+                            rules: rules.map((r) => ({ code: r.code, msg: r.msg, rx: r.rx, src: r.src, title: r.title, solution: r.solution, docs: r.docs })),
                         })
                     );
                 } catch (e) {}
@@ -243,7 +257,10 @@
                 if (!mm) continue;
                 groups = mm.groups || {};
             }
-            return { title: r.title || '(без заголовка)', text: fillTemplate(r.solution, { ...e, ...groups }) };
+            const ctx = { ...e, ...groups };
+            const raw = Array.isArray(r.solution) ? r.solution : [r.solution];
+            const blocks = raw.map((b) => fillTemplate(b, ctx)).filter((b) => b && b.trim());
+            return { title: r.title || '(без заголовка)', blocks, docs: r.docs || '' };
         }
         return null;
     }
@@ -493,11 +510,20 @@
                 background: #eef1f4; border: 1px solid #d7dde3; color: #3a4048;
                 padding: 8px 10px; border-radius: 6px; white-space: pre-wrap; word-break: break-word;
             }
-            #cqr-err-helper .cqr-sol-title { font-weight: 600; margin-bottom: 6px; }
+            #cqr-err-helper .cqr-sol-title { font-weight: 600; margin-bottom: 8px; }
+            #cqr-err-helper .cqr-sol-block { margin: 0 0 12px; }
             #cqr-err-helper .cqr-sol-text {
                 background: #f4f7f5; border: 1px solid #d9e5df; border-radius: 6px;
                 padding: 10px; white-space: pre-wrap; word-break: break-word;
             }
+            #cqr-err-helper .cqr-sol-block > button {
+                margin-top: 6px; cursor: pointer; border: 1px solid #cfcfcf; background: #fafafa;
+                border-radius: 5px; padding: 5px 10px; font-size: 12px;
+            }
+            #cqr-err-helper .cqr-sol-block > button:hover { background: #f0f0f0; }
+            #cqr-err-helper .cqr-docs { margin: 4px 0 2px; font-size: 12px; }
+            #cqr-err-helper .cqr-docs a { color: #0f6ecd; text-decoration: none; }
+            #cqr-err-helper .cqr-docs a:hover { text-decoration: underline; }
             #cqr-err-helper .cqr-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
             #cqr-err-helper .cqr-actions button {
                 cursor: pointer; border: 1px solid #cfcfcf; background: #fafafa;
@@ -537,10 +563,25 @@
             (primary.itemId ?? '') !== '' && `item_id: ${primary.itemId}`,
         ].filter(Boolean).join(' · ');
 
-        const solBlock = hit
-            ? `<div class="cqr-sol-title">${esc(hit.title)}</div>
-               <div class="cqr-sol-text">${esc(hit.text)}</div>`
-            : `<div class="cqr-info-text">${esc(rulesNote())}</div>`;
+        let solBlock;
+        if (!hit) {
+            solBlock = `<div class="cqr-info-text">${esc(rulesNote())}</div>`;
+        } else {
+            const multi = hit.blocks.length > 1;
+            const blocksHtml = hit.blocks
+                .map((b, i) => {
+                    const label = multi ? `Копіювати повідомлення ${i + 1}` : 'Копіювати рішення';
+                    return `<div class="cqr-sol-block">
+                        <div class="cqr-sol-text">${esc(b)}</div>
+                        <button data-act="copy-blk" data-i="${i}">${label}</button>
+                    </div>`;
+                })
+                .join('');
+            const docsHtml = hit.docs
+                ? `<div class="cqr-docs">Детальніше в мануалі → <a href="${esc(hit.docs)}" target="_blank" rel="noopener">${esc(hit.docs)}</a></div>`
+                : '';
+            solBlock = `<div class="cqr-sol-title">${esc(hit.title)}</div>${blocksHtml}${docsHtml}`;
+        }
 
         return `
             <h5>Помилка</h5>
@@ -550,7 +591,6 @@
             ${solBlock}
             <div class="cqr-actions">
                 <button data-act="copy-err">Копіювати помилку</button>
-                ${hit ? '<button data-act="copy-sol">Копіювати рішення</button>' : ''}
                 <button data-act="back">Назад</button>
             </div>
             <details><summary>Сирий рядок помилки</summary><pre>${esc(primary.raw)}</pre></details>
@@ -596,7 +636,10 @@
             const act = e.target.getAttribute && e.target.getAttribute('data-act');
             if (!act) return;
             if (act === 'copy-err') navigator.clipboard.writeText(primary ? primary.raw : '');
-            if (act === 'copy-sol') navigator.clipboard.writeText(hit ? hit.title + '\n\n' + hit.text : '');
+            if (act === 'copy-blk' && hit) {
+                const i = +(e.target.getAttribute('data-i') || 0);
+                navigator.clipboard.writeText(hit.blocks[i] || '');
+            }
             if (act === 'copy-page') navigator.clipboard.writeText(pageSnippet());
             if (act === 'back') { document.referrer ? (location.href = document.referrer) : history.back(); }
         });

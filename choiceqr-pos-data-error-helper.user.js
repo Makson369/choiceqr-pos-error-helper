@@ -6,6 +6,8 @@
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
 // @match        https://europe-west1-choiceqr.cloudfunctions.net/pos-data/*
+// @updateURL    https://raw.githubusercontent.com/Makson369/choiceqr-pos-error-helper/main/choiceqr-pos-data-error-helper.user.js
+// @downloadURL  https://raw.githubusercontent.com/Makson369/choiceqr-pos-error-helper/main/choiceqr-pos-data-error-helper.user.js
 // @run-at       document-idle
 // @grant        GM_xmlhttpRequest
 // @grant        GM.xmlHttpRequest

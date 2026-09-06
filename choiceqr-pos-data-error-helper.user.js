@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.3.0
+// @version      3.4.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -66,6 +66,22 @@
     let RULES = [];
     let RULES_REV = 0;
     let RULES_TRIED = false;
+    let RULES_TS = 0; // коли базу востаннє завантажено (мс)
+    let updTimer = 0;
+
+    function relTime(ts) {
+        if (!ts) return '';
+        const d = Date.now() - ts;
+        if (d < 60e3) return 'щойно';
+        if (d < 3600e3) return Math.round(d / 60e3) + ' хв тому';
+        if (d < 86400e3) return Math.round(d / 3600e3) + ' год тому';
+        const x = new Date(ts);
+        const p = (n) => String(n).padStart(2, '0');
+        return `${p(x.getDate())}.${p(x.getMonth() + 1)} ${p(x.getHours())}:${p(x.getMinutes())}`;
+    }
+    function updatedLabel() {
+        return RULES_TS ? `Базу правил оновлено: ${relTime(RULES_TS)}` : 'База правил ще не завантажена';
+    }
 
     /* ═══════════════════════════════════════════════════════════════
      *  Завантаження бази правил
@@ -217,11 +233,12 @@
         try {
             const rules = parseRules(await httpGet(RULES_URL, bust));
             if (rules.length) {
+                RULES_TS = Date.now();
                 try {
                     localStorage.setItem(
                         RULES_CACHE_KEY,
                         JSON.stringify({
-                            ts: Date.now(),
+                            ts: RULES_TS,
                             rules: rules.map((r) => ({ code: r.code, msg: r.msg, rx: r.rx, src: r.src, title: r.title, solution: r.solution, docs: r.docs })),
                         })
                     );
@@ -561,6 +578,10 @@
                 white-space: pre-wrap; word-break: break-word; font-size: 11px;
                 background: #f6f6f6; border: 1px solid #e3e3e3; border-radius: 6px; padding: 8px;
             }
+            #cqr-err-helper .cqr-updated {
+                margin-top: 14px; padding-top: 8px; border-top: 1px solid #eee;
+                font-size: 11px; color: #999;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -576,9 +597,9 @@
                 <div class="cqr-info-text">${esc(hint)}</div>
                 <div class="cqr-actions">
                     <button data-act="copy-page">Копіювати вміст сторінки</button>
-                    <button data-act="back">Назад</button>
                 </div>
                 <details><summary>Вміст сторінки</summary><pre>${esc(pageSnippet())}</pre></details>
+                <div class="cqr-updated">${esc(updatedLabel())}</div>
             `;
         }
 
@@ -617,9 +638,9 @@
             ${solBlock}
             <div class="cqr-actions">
                 <button data-act="copy-err">Копіювати помилку</button>
-                <button data-act="back">Назад</button>
             </div>
             <details><summary>Сирий рядок помилки</summary><pre>${esc(primary.raw)}</pre></details>
+            <div class="cqr-updated">${esc(updatedLabel())}</div>
         `;
     }
 
@@ -669,8 +690,15 @@
                 navigator.clipboard.writeText(hit.blocks[i] || '');
             }
             if (act === 'copy-page') navigator.clipboard.writeText(pageSnippet());
-            if (act === 'back') { document.referrer ? (location.href = document.referrer) : history.back(); }
         });
+
+        // раз на 30 с оновлюємо напис «оновлено N хв тому»
+        clearInterval(updTimer);
+        updTimer = setInterval(() => {
+            const el = document.querySelector('#cqr-err-helper .cqr-updated');
+            if (!el) { clearInterval(updTimer); return; }
+            el.textContent = updatedLabel();
+        }, 30000);
     }
 
     function run() {
@@ -698,7 +726,7 @@
      * ═══════════════════════════════════════════════════════════════ */
     (function boot() {
         const c = readCache();
-        if (c) RULES = c.rules;
+        if (c) { RULES = c.rules; RULES_TS = c.ts || 0; }
         run(); // миттєво: з кешу або порожньо
 
         const fresh = c && Date.now() - c.ts < RULES_TTL_MS;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.2.0
+// @version      3.2.1
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -68,7 +68,9 @@
     /* ═══════════════════════════════════════════════════════════════
      *  Завантаження бази правил
      * ═══════════════════════════════════════════════════════════════ */
-    function httpGet(url) {
+    function httpGet(url, bust) {
+        // bust=true → унікальний query, щоб оминути CDN-кеш GitHub raw (max-age=300)
+        if (bust) url += (url.includes('?') ? '&' : '?') + '_=' + Date.now();
         return new Promise((resolve, reject) => {
             const gm =
                 typeof GM_xmlhttpRequest === 'function'
@@ -80,6 +82,7 @@
                 gm({
                     method: 'GET',
                     url,
+                    headers: bust ? { 'Cache-Control': 'no-cache', Pragma: 'no-cache' } : {},
                     onload: (r) => (r.status >= 200 && r.status < 400 ? resolve(r.responseText) : reject(new Error('HTTP ' + r.status))),
                     onerror: () => reject(new Error('network')),
                     ontimeout: () => reject(new Error('timeout')),
@@ -206,11 +209,11 @@
         return null;
     }
 
-    async function fetchRules() {
+    async function fetchRules(bust) {
         RULES_TRIED = true;
         if (!CONFIGURED) return null;
         try {
-            const rules = parseRules(await httpGet(RULES_URL));
+            const rules = parseRules(await httpGet(RULES_URL, bust));
             if (rules.length) {
                 try {
                     localStorage.setItem(
@@ -623,9 +626,11 @@
 
         const refreshBtn = panel.querySelector('.cqr-refresh');
         refreshBtn.addEventListener('click', async () => {
+            if (refreshBtn.dataset.busy) return;
+            refreshBtn.dataset.busy = '1';
             refreshBtn.textContent = '…';
             try { localStorage.removeItem(RULES_CACHE_KEY); } catch (e) {}
-            const r = await fetchRules();
+            const r = await fetchRules(true); // bust CDN-кеш
             if (r) { RULES = r; RULES_REV++; }
             const p = document.getElementById('cqr-err-helper');
             if (p) p.remove();

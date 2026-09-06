@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.2.1
+// @version      3.3.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -430,7 +430,28 @@
         return r;
     }
 
+    // Прев'ю правила без реальної помилки:
+    //   ?cqr_preview=<текст помилки>[&cqr_src=Syrve][&cqr_code=209][&cqr_item=3]
+    //   [&cqr_pid=531][&cqr_group=Соуси]
+    function previewError() {
+        const q = new URLSearchParams(location.search);
+        const msg = q.get('cqr_preview');
+        if (!msg) return null;
+        return [{
+            source: q.get('cqr_src') || '',
+            code: q.get('cqr_code') || undefined,
+            message: msg,
+            itemId: q.get('cqr_item') || undefined,
+            productId: q.get('cqr_pid') || undefined,
+            groupName: q.get('cqr_group') || undefined,
+            httpCode: q.get('cqr_http') || undefined,
+            raw: 'ПРЕВʼЮ: ' + msg,
+        }];
+    }
+
     function collectErrors() {
+        const pv = previewError();
+        if (pv) return pv;
         const h2 = [...document.querySelectorAll('h2')]
             .filter(outsidePanel)
             .map((h) => h.textContent.trim().toLowerCase());

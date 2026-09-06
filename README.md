@@ -43,6 +43,20 @@ Tampermonkey-скрипт для сторінки
 - `regex` перевіряється по тексту помилки (прапорець `i`). Іменовані групи
   `(?<name>…)` доступні в `solution` як `{name}`.
 
+## Перевірити правило без реальної помилки (прев'ю)
+
+Відкрити будь-яку сторінку `pos-data/...` з параметрами:
+
+```
+?cqr_preview=<текст помилки>
+   &cqr_src=Poster|Syrve        (опц., якщо правило вимагає source)
+   &cqr_code=209                (опц.)
+   &cqr_item=3 &cqr_pid=531 &cqr_group=Соуси   (опц. підстановки)
+```
+
+Приклад (rule #6):
+`…/pos-data/CFD8F0A8-2809-4FF9-96C8-F78A11A3B78B?cqr_src=Syrve&cqr_preview=Cannot%20find%20fixed%20group%20modifiers%20'Syrups'%20in%20order%20item%20'Fluff%20Coffee'%20(Id%20%3D%205a85e337-4f23-4164-95c5-cdd501e22664)`
+
 ## Як додати нове правило
 
 1. Дописати обʼєкт у масив `RULES` у `gen-rules.js` (там зручні хелпери).

@@ -19,7 +19,7 @@ const RULES = [
     match: { message: 'product id is undefined', source: 'Poster' },
     title: 'Poster: pos-id страви не знайдено',
     solution: L(
-      'Poster не може знайти у своїй системі pos-id страви (item_id: {itemId}).',
+      '123Poster не може знайти у своїй системі pos-id страви (item_id: {itemId}).',
       '',
       'До позиції [назва позиції] вказано неактуальний POS ID.',
       'Має бути: [актуальний pos-id]',

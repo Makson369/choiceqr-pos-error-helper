@@ -44,6 +44,14 @@
   },
   {
     "match": {
+      "regex": "Product\\s+[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]?(?<name>.+?)[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]?\\s*\\((?<pid>[0-9a-f-]{20,})\\)\\s+is excluded from menu",
+      "source": "Syrve"
+    },
+    "title": "Syrve: позиція виключена з меню",
+    "solution": "Замовлення не передалось у Syrve: позиція «{name}» виключена з меню (is excluded from menu). Найімовірніше її вимкнено в Syrve або її немає у вивантаженні меню Syrve. Треба увімкнути / повернути її в Syrve — або прибрати з меню Choice.\n\nPOS ID: {pid}"
+  },
+  {
+    "match": {
       "regex": "Cannot find fixed group modifiers\\s+[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB](?<group>[^\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]+)[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]\\s+in order item\\s+[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB](?<item>[^\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]+)[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)",
       "source": "Syrve"
     },

@@ -7,6 +7,8 @@ const NQ = "[^\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]";
 
 const rxInactive =
   'Product\\s+' + Q + '?(?<name>.+?)' + Q + '?\\s*\\((?<pid>[0-9a-f-]{20,})\\)\\s+is inactive';
+const rxExcluded =
+  'Product\\s+' + Q + '?(?<name>.+?)' + Q + '?\\s*\\((?<pid>[0-9a-f-]{20,})\\)\\s+is excluded from menu';
 const rxFixedGroup =
   'Cannot find fixed group modifiers\\s+' + Q + '(?<group>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
@@ -72,6 +74,15 @@ const RULES = [
     title: 'Syrve: позиція вимкнена з продажу',
     solution: L(
       'Замовлення не передалось до POS системи через те, що позиція «{name}» вимкнена для замовлення в POS системі. Вам потрібно її увімкнути в Syrve або вимкнути для замовлення в Choice.',
+      '',
+      'POS ID: {pid}'
+    ),
+  },
+  {
+    match: { regex: rxExcluded, source: 'Syrve' },
+    title: 'Syrve: позиція виключена з меню',
+    solution: L(
+      'Замовлення не передалось у Syrve: позиція «{name}» виключена з меню (is excluded from menu). Найімовірніше її вимкнено в Syrve або її немає у вивантаженні меню Syrve. Треба увімкнути / повернути її в Syrve — або прибрати з меню Choice.',
       '',
       'POS ID: {pid}'
     ),

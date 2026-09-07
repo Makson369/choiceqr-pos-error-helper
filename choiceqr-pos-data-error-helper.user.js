@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.4.0
+// @version      3.4.1
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -278,6 +278,7 @@
                 const mm = msg.match(r._re);
                 if (!mm) continue;
                 groups = mm.groups || {};
+                for (const k in groups) if (typeof groups[k] === 'string') groups[k] = groups[k].trim();
             }
             const ctx = { ...e, ...groups };
             const raw = Array.isArray(r.solution) ? r.solution : [r.solution];

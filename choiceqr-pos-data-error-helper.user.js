@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.5.0
+// @version      3.6.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -509,9 +509,20 @@
         return 'Цієї помилки ще немає в базі. Додай новий запис у файл бази з рішенням.';
     }
 
+    // Повний текст сторінки (Payload/Response дампи) без нашої панелі.
+    function pageText() {
+        const blocks = [...document.querySelectorAll('h2, pre')]
+            .filter(outsidePanel)
+            .map((el) => (el.innerText || el.textContent || '').trim())
+            .filter(Boolean);
+        const t = blocks.length ? blocks.join('\n\n') : (document.body.innerText || '').trim();
+        return t.replace(/\n{3,}/g, '\n\n');
+    }
+
+    // Скорочений варіант для попереднього перегляду в <details>.
     function pageSnippet() {
-        const t = (document.body.innerText || '').trim().replace(/\n{3,}/g, '\n\n');
-        return t.length > 1200 ? t.slice(0, 1200) + '…' : t;
+        const t = pageText();
+        return t.length > 8000 ? t.slice(0, 8000) + '\n…' : t;
     }
 
     function injectStyleOnce() {
@@ -692,7 +703,7 @@
                 const i = +(e.target.getAttribute('data-i') || 0);
                 navigator.clipboard.writeText(hit.blocks[i] || '');
             }
-            if (act === 'copy-page') navigator.clipboard.writeText(pageSnippet());
+            if (act === 'copy-page') navigator.clipboard.writeText(pageText());
         });
 
         // раз на 30 с оновлюємо напис «оновлено N хв тому»

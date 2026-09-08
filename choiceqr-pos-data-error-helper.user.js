@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.4.1
+// @version      3.5.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -254,7 +254,7 @@
     /* ═══════════════════════════════════════════════════════════════
      *  Зіставлення помилки з правилом
      * ═══════════════════════════════════════════════════════════════ */
-    const KNOWN_KEYS = ['code', 'message', 'source', 'itemId', 'productId', 'groupName', 'httpCode'];
+    const KNOWN_KEYS = ['code', 'message', 'source', 'itemId', 'productId', 'groupName', 'httpCode', 'orderNumber'];
 
     function fillTemplate(str, ctx) {
         return String(str == null ? '' : str)
@@ -339,6 +339,7 @@
                         httpCode: undefined,
                         message: (ei && (ei.message || ei.description)) || `creationStatus: ${status}`,
                         itemId: undefined,
+                        orderNumber: info.externalNumber || obj.externalNumber || undefined,
                         raw: line,
                     });
                 }
@@ -450,7 +451,7 @@
 
     // Прев'ю правила без реальної помилки:
     //   ?cqr_preview=<текст помилки>[&cqr_src=Syrve][&cqr_code=209][&cqr_item=3]
-    //   [&cqr_pid=531][&cqr_group=Соуси]
+    //   [&cqr_pid=531][&cqr_group=Соуси][&cqr_order=26758]
     function previewError() {
         const q = new URLSearchParams(location.search);
         const msg = q.get('cqr_preview');
@@ -463,6 +464,7 @@
             productId: q.get('cqr_pid') || undefined,
             groupName: q.get('cqr_group') || undefined,
             httpCode: q.get('cqr_http') || undefined,
+            orderNumber: q.get('cqr_order') || undefined,
             raw: 'ПРЕВʼЮ: ' + msg,
         }];
     }

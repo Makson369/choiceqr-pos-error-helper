@@ -13,6 +13,9 @@ const rxFixedGroup =
   'Cannot find fixed group modifiers\\s+' + Q + '(?<group>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
+const rxInvalidGroupAmount =
+  'Order item modifier\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
+  '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+has invalid group amount';
 
 const L = (...a) => a.join('\n');
 
@@ -93,6 +96,23 @@ const RULES = [
       'Спробуйте перезавантажити касу і перевірити наявність мережі.',
       'Це замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊'
     ),
+  },
+  {
+    match: { regex: rxInvalidGroupAmount, source: 'Syrve' },
+    title: 'Syrve: не вибрано обовʼязковий модифікатор',
+    solution: [
+      L(
+        'Замовлення #{orderNumber}',
+        '',
+        'Помилка повідомляє, що відсутній обовʼязковий модифікатор «{mod}» ({modId}) до позиції [назва позиції].'
+      ),
+      L(
+        'Ось це доповнення потрібно увімкнути до цієї позиції.',
+        '',
+        'Посилання на позицію: [посилання]',
+        '+ фото'
+      ),
+    ],
   },
   {
     match: { regex: rxFixedGroup, source: 'Syrve' },

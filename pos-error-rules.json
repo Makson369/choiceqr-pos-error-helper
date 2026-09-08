@@ -51,6 +51,13 @@
   },
   {
     "match": {
+      "message": "creation timeout expired"
+    },
+    "title": "POS: немає звʼязку з касою (creation timeout)",
+    "solution": "Не було звʼязку із касою (Creation timeout expired).\n\nСпробуйте перезавантажити касу і перевірити наявність мережі.\nЦе замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊"
+  },
+  {
+    "match": {
       "regex": "Cannot find fixed group modifiers\\s+[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB](?<group>[^\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]+)[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]\\s+in order item\\s+[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB](?<item>[^\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]+)[\\u0022\\u0027\\u2018\\u2019\\u201C\\u201D\\u00AB\\u00BB]\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)",
       "source": "Syrve"
     },

@@ -85,6 +85,16 @@ const RULES = [
     ),
   },
   {
+    match: { message: 'creation timeout expired' },
+    title: 'POS: немає звʼязку з касою (creation timeout)',
+    solution: L(
+      'Не було звʼязку із касою (Creation timeout expired).',
+      '',
+      'Спробуйте перезавантажити касу і перевірити наявність мережі.',
+      'Це замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊'
+    ),
+  },
+  {
     match: { regex: rxFixedGroup, source: 'Syrve' },
     title: 'Syrve: набір доповнень не привʼязаний до позиції',
     solution: [

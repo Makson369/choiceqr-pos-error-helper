@@ -22,9 +22,9 @@ const L = (...a) => a.join('\n');
 const RULES = [
   {
     match: { message: 'product id is undefined', source: 'Poster' },
-    title: 'Poster: pos-id страви не знайдено',
+    title: 'Poster: pos-id позиції не знайдено',
     solution: L(
-      'Poster не може знайти у своїй системі pos-id страви (POS ID: {itemId}).',
+      'Poster не може знайти у своїй системі pos-id позиції (POS ID: {itemId}).',
       '',
       'До позиції [назва позиції] вказано неактуальний POS ID.',
       'Має бути: [актуальний pos-id]',
@@ -48,7 +48,7 @@ const RULES = [
   },
   {
     match: { message: 'product id is empty', source: 'Poster' },
-    title: 'Poster: у страви немає pos-id',
+    title: 'Poster: у позиції немає pos-id',
     solution: L(
       'До позиції (назва позиції) відсутній POS ID',
       'Ось цей POS ID має бути до цієї позиції: ',

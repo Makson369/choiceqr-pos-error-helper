@@ -4,8 +4,8 @@
       "message": "product id is undefined",
       "source": "Poster"
     },
-    "title": "Poster: pos-id страви не знайдено",
-    "solution": "Poster не може знайти у своїй системі pos-id страви (POS ID: {itemId}).\n\nДо позиції [назва позиції] вказано неактуальний POS ID.\nМає бути: [актуальний pos-id]\n\nПосилання на позицію: [посилання]\n\nДетальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
+    "title": "Poster: pos-id позиції не знайдено",
+    "solution": "Poster не може знайти у своїй системі pos-id позиції (POS ID: {itemId}).\n\nДо позиції [назва позиції] вказано неактуальний POS ID.\nМає бути: [актуальний pos-id]\n\nПосилання на позицію: [посилання]\n\nДетальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
   },
   {
     "match": {
@@ -23,7 +23,7 @@
       "message": "product id is empty",
       "source": "Poster"
     },
-    "title": "Poster: у страви немає pos-id",
+    "title": "Poster: у позиції немає pos-id",
     "solution": "До позиції (назва позиції) відсутній POS ID\nОсь цей POS ID має бути до цієї позиції: \n\nПосилання на позицію:\n\nДетальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2"
   },
   {

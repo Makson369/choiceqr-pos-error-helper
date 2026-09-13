@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.6.0
+// @version      3.7.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -449,9 +449,13 @@
         return r;
     }
 
-    // Прев'ю правила без реальної помилки:
+    // Прев'ю правила без реальної помилки (з вигаданими прикладами підстановок):
     //   ?cqr_preview=<текст помилки>[&cqr_src=Syrve][&cqr_code=209][&cqr_item=3]
     //   [&cqr_pid=531][&cqr_group=Соуси][&cqr_order=26758]
+    //
+    // Або сирий шаблон правила БЕЗ підстановок узагалі — ?cqr_rule=<N> (1-based,
+    // N = порядковий номер правила в pos-error-rules.json). {itemId} тощо → «—»,
+    // {name}/{group}/{mod}… (з regex) лишаються буквально як плейсхолдери.
     function previewError() {
         const q = new URLSearchParams(location.search);
         const msg = q.get('cqr_preview');
@@ -479,6 +483,30 @@
         return extractSimple();
     }
 
+    // Сирий шаблон правила без матчингу й підстановок: ?cqr_rule=<N> (1-based, порядок у базі).
+    // {itemId} тощо → «—», {name}/{group}/{mod}… (з regex) лишаються як є — саме без «вигаданих» слів.
+    function ruleDebugError() {
+        const q = new URLSearchParams(location.search);
+        const n = parseInt(q.get('cqr_rule'), 10);
+        if (!n || !RULES[n - 1]) return null;
+        const r = RULES[n - 1];
+        const cond = [
+            r.code && `code = ${r.code}`,
+            r.src && `source = ${r.src}`,
+            r.msg && `message містить «${r.msg}»`,
+            r.rx && `regex: ${r.rx}`,
+        ].filter(Boolean).join(' · ');
+        const primary = {
+            source: r.src || '',
+            code: r.code || undefined,
+            message: `[шаблон правила #${n} — без підстановок]`,
+            raw: cond || '(без умов)',
+        };
+        const raw = Array.isArray(r.solution) ? r.solution : [r.solution];
+        const blocks = raw.map((b) => fillTemplate(b, {})).filter((b) => b && b.trim());
+        return { primary, hit: { title: r.title || '(без заголовка)', blocks, docs: r.docs || '' } };
+    }
+
     function pickPrimary(errors) {
         return (
             errors.find((e) => e.code != null && e.message) ||
@@ -497,6 +525,7 @@
         known: { bg: '#0f7b4a', text: '✅ Знайдено рішення' },
         unknown: { bg: '#8a6d00', text: '⚠️ Помилка без рішення в базі' },
         clean: { bg: '#4a4f57', text: 'ℹ️ POS data — помилок немає' },
+        debug: { bg: '#1d4ed8', text: '🔎 Шаблон правила (без підстановок)' },
     };
 
     function rulesNote() {
@@ -717,10 +746,18 @@
 
     function run() {
         try {
-            const errors = collectErrors();
-            const primary = errors.length ? pickPrimary(errors) : null;
-            const hit = primary ? matchRule(primary) : null;
-            const state = !primary ? 'clean' : hit ? 'known' : 'unknown';
+            const dbg = ruleDebugError();
+            let primary, hit, state;
+            if (dbg) {
+                primary = dbg.primary;
+                hit = dbg.hit;
+                state = 'debug';
+            } else {
+                const errors = collectErrors();
+                primary = errors.length ? pickPrimary(errors) : null;
+                hit = primary ? matchRule(primary) : null;
+                state = !primary ? 'clean' : hit ? 'known' : 'unknown';
+            }
             const sig = [state, RULES_REV, primary ? (primary.code ?? '') : '', primary ? primary.message || '' : ''].join('|');
 
             const existing = document.getElementById('cqr-err-helper');

@@ -16,6 +16,10 @@ const rxFixedGroup =
 const rxInvalidGroupAmount =
   'Order item modifier\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+has invalid group amount';
+const rxSimpleModifier =
+  'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
+  '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
+  '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
 
 const L = (...a) => a.join('\n');
 
@@ -126,6 +130,21 @@ const RULES = [
         'Для вирішення потрібно одне з двох:',
         '• вимкнути доповнення «{group}» у цієї позиції в меню Choice;',
         '• або додати доповнення «{group}» до цієї позиції в Syrve.'
+      ),
+    ],
+  },
+  {
+    match: { regex: rxSimpleModifier, source: 'Syrve' },
+    title: 'Syrve: модифікатор не привʼязаний до позиції',
+    solution: [
+      L(
+        'Помилочка повідомляє, що до позиції «{item}» у чеку додано модифікатор «{mod}»,',
+        'але в системі Syrve цей модифікатор до цієї позиції не доданий.'
+      ),
+      L(
+        'Для вирішення потрібно одне з двох:',
+        '• вимкнути модифікатор «{mod}» у цієї позиції в меню Choice;',
+        '• або додати модифікатор «{mod}» до цієї позиції в Syrve.'
       ),
     ],
   },

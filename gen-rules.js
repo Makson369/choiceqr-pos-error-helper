@@ -15,7 +15,8 @@ const rxFixedGroup =
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
 const rxInvalidGroupAmount =
   'Order item modifier\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
-  '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+has invalid group amount';
+  '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+has invalid group amount:\\s*' +
+  'min\\s*=\\s*(?<min>\\d+),\\s*max\\s*=\\s*(?<max>\\d+),\\s*actual\\s*=\\s*(?<actual>\\d+)';
 const rxSimpleModifier =
   'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
@@ -103,15 +104,17 @@ const RULES = [
   },
   {
     match: { regex: rxInvalidGroupAmount, source: 'Syrve' },
-    title: 'Syrve: не вибрано обовʼязковий модифікатор',
+    title: 'Syrve: некоректна кількість вибору модифікатора',
     solution: [
       L(
-        'Замовлення #{orderNumber}',
+        'Замовлення № {orderNumber}',
         '',
-        'Помилка повідомляє, що відсутній обовʼязковий модифікатор «{mod}» ({modId}) до позиції [назва позиції].'
+        'Повідомлення про помилку вказує, що виникли проблеми з модифікатором «{mod}» ({modId}) для позиції [назва позиції].',
+        '',
+        'Згідно з налаштуваннями Syrve — має бути мінімум {min} і максимум {max} доповнень цього набору, а в замовленні обрано {actual}.'
       ),
       L(
-        'Ось це доповнення потрібно увімкнути до цієї позиції.',
+        'Перевірте набір доповнень «{mod}» для цієї позиції в Syrve і Choice.',
         '',
         'Посилання на позицію: [посилання]',
         '+ фото'

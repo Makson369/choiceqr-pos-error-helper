@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.7.0
+// @version      3.8.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -295,6 +295,11 @@
         try { return JSON.parse(s); } catch (e) { return null; }
     }
 
+    // "2277|707" (номер + WOLT-суфікс) → "2277"; порожньо → undefined.
+    function firstPart(s) {
+        return s ? String(s).split('|')[0] : undefined;
+    }
+
     // Кожен запис у <pre> відділений <br> і є JSON-рядком у лапках. Розгортаємо.
     function preLines(pre) {
         const raw = pre.innerHTML.replace(/<br\s*\/?>/gi, '\n');
@@ -339,7 +344,7 @@
                         httpCode: undefined,
                         message: (ei && (ei.message || ei.description)) || `creationStatus: ${status}`,
                         itemId: undefined,
-                        orderNumber: info.externalNumber || obj.externalNumber || undefined,
+                        orderNumber: firstPart(info.externalNumber || obj.externalNumber),
                         raw: line,
                     });
                 }

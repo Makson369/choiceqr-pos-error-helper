@@ -21,6 +21,9 @@ const rxSimpleModifier =
   'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
+const rxParentGroupNotAllowed =
+  'Cannot add product\\s+' + Q + '(?<name>' + NQ + '+)' + Q +
+  '\\s*\\((?<pid>[0-9a-f-]{8,})\\)\\s*:\\s*it.s top parent group isn.t allowed for current department';
 
 const L = (...a) => a.join('\n');
 
@@ -150,6 +153,20 @@ const RULES = [
         '• або додати модифікатор «{mod}» до цієї позиції в Syrve.'
       ),
     ],
+  },
+  {
+    match: { regex: rxParentGroupNotAllowed, source: 'Syrve' },
+    title: 'Syrve: товар недоступний для цього департаменту',
+    solution: L(
+      'Syrve не може додати позицію «{name}» до чека — її батьківська група товарів недоступна',
+      'для цього департаменту (точки).',
+      '',
+      'Ймовірно позицію перемістили в Syrve у папку «Архів» або іншу групу, приховану для',
+      'продажу на цій точці. Треба повернути її у потрібний департамент/групу в Syrve —',
+      'або прибрати з меню Choice.',
+      '',
+      'POS ID: {pid}'
+    ),
   },
 ];
 

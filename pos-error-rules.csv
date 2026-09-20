@@ -1,4 +1,4 @@
-﻿match_code,match_message,match_regex,match_source,title,solution,docs
+﻿match_code,match_message,match_regex,match_source,title,solution,docs,match_marketplace
 ,product id is undefined,,Poster,Poster: pos-id позиції не знайдено,"Poster не може знайти у своїй системі pos-id позиції (POS ID: {itemId}).
 
 До позиції [назва позиції] вказано неактуальний POS ID.
@@ -6,33 +6,33 @@
 
 Посилання на позицію: [посилання]
 
-Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",
+Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",,
 ,required modification missing,,Poster,Poster: не додано обовʼязковий модифікатор,"У позиції [назва позиції] є обовʼязковий набір доповнень «{groupName}», але в Choice він не доданий - тому Poster не може обробити чек
 
 Ось це доповнення має бути обовʼязково до цієї позиції: [посилання на позицію з фото цього доповнення]
 
-Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",
+Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",,
 ,product id is empty,,Poster,Poster: у позиції немає pos-id,"До позиції (назва позиції) відсутній POS ID
 Ось цей POS ID має бути до цієї позиції: 
 
 Посилання на позицію:
 
-Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",
+Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",,
 ,cannot read properties of undefined (reading 'order'),,,Посилання не веде на конкретне замовлення,"У URL немає selectedOrderId, тому бекенд не може дістати order.
 
 1. Адмінка → Orders.
 2. Клікнути потрібне замовлення — у URL зʼявиться ?selectedOrderId=<id>.
-3. Скопіювати ПОВНИЙ URL і вставити у поле Order URL.",
+3. Скопіювати ПОВНИЙ URL і вставити у поле Order URL.",,
 ,,"Product\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?(?<name>.+?)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s*\((?<pid>[0-9a-f-]{20,})\)\s+is inactive",Syrve,Syrve: позиція вимкнена з продажу,"Замовлення не передалось до POS системи через те, що позиція «{name}» вимкнена для замовлення в POS системі. Вам потрібно її увімкнути в Syrve або вимкнути для замовлення в Choice.
 
-POS ID: {pid}",
+POS ID: {pid}",,
 ,,"Product\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?(?<name>.+?)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s*\((?<pid>[0-9a-f-]{20,})\)\s+is excluded from menu",Syrve,Syrve: позиція виключена з меню,"Замовлення не передалось у Syrve: позиція «{name}» виключена з меню (is excluded from menu). Найімовірніше її вимкнено в Syrve або її немає у вивантаженні меню Syrve. Треба увімкнути / повернути її в Syrve — або прибрати з меню Choice.
 
-POS ID: {pid}",
+POS ID: {pid}",,
 ,creation timeout expired,,,POS: немає звʼязку з касою (creation timeout),"Не було звʼязку із касою (Creation timeout expired).
 
 Спробуйте перезавантажити касу і перевірити наявність мережі.
-Це замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊",
+Це замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊",,
 ,,"Order item modifier\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<mod>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\((?<modId>[0-9a-f-]{8,})\)\s+has invalid group amount:\s*min\s*=\s*(?<min>\d+),\s*max\s*=\s*(?<max>\d+),\s*actual\s*=\s*(?<actual>\d+)",Syrve,Syrve: некоректна кількість вибору модифікатора,"Замовлення № {orderNumber}
 
 Повідомлення про помилку вказує, що виникли проблеми з модифікатором «{mod}» ({modId}) для позиції [назва позиції].
@@ -42,19 +42,19 @@ POS ID: {pid}",
 Перевірте набір доповнень «{mod}» для цієї позиції в Syrve і Choice.
 
 Посилання на позицію: [посилання]
-+ фото",
++ фото",,
 ,,"Cannot find fixed group modifiers\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<group>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s+in order item\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<item>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\(Id\s*=\s*(?<id>[0-9a-f-]{8,})\)",Syrve,Syrve: набір доповнень не привʼязаний до позиції,"Помилочка повідомляє, що до позиції «{item}» у чеку додано доповнення «{group}»,
 але в системі Syrve цей набір доповнень до цієї позиції не доданий.
 
 Для вирішення потрібно одне з двох:
 • вимкнути доповнення «{group}» у цієї позиції в меню Choice;
-• або додати доповнення «{group}» до цієї позиції в Syrve.",
+• або додати доповнення «{group}» до цієї позиції в Syrve.",,
 ,,"Cannot find fixed simple modifiers item\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<mod>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s+in order item\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<item>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\(Id\s*=\s*(?<id>[0-9a-f-]{8,})\)",Syrve,Syrve: модифікатор не привʼязаний до позиції,"Помилочка повідомляє, що до позиції «{item}» у чеку додано модифікатор «{mod}»,
 але в системі Syrve цей модифікатор до цієї позиції не доданий.
 
 Для вирішення потрібно одне з двох:
 • вимкнути модифікатор «{mod}» у цієї позиції в меню Choice;
-• або додати модифікатор «{mod}» до цієї позиції в Syrve.",
+• або додати модифікатор «{mod}» до цієї позиції в Syrve.",,
 ,,"Cannot add product\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<name>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\((?<pid>[0-9a-f-]{8,})\)\s*:\s*it.s top parent group isn.t allowed for current department",Syrve,Syrve: товар недоступний для цього департаменту,"Syrve не може додати позицію «{name}» до чека — її батьківська група товарів недоступна
 для цього департаменту (точки).
 
@@ -62,4 +62,8 @@ POS ID: {pid}",
 продажу на цій точці. Треба повернути її у потрібний департамент/групу в Syrve —
 або прибрати з меню Choice.
 
-POS ID: {pid}",
+POS ID: {pid}",,
+,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID (маркетплейс),"Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].
+Потрібно додати POS ID та виконати синхронізацію актуального меню для маркетплейсу.",,true
+,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID,"Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].
+Потрібно додати POS ID.",,false

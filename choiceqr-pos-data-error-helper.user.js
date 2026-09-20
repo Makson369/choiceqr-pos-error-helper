@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.8.0
+// @version      3.9.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -157,6 +157,8 @@
             title: String(o.title ?? '').trim(),
             solution: sol,
             docs: String(o.docs ?? '').trim(),
+            // marketplace: true/"1"/"yes" → лише замовлення з маркетплейсу; false/"0"/"no" → лише звичайні
+            mp: /^(true|1|yes)$/i.test(String(o.mp ?? '').trim()) ? '1' : /^(false|0|no)$/i.test(String(o.mp ?? '').trim()) ? '0' : '',
         };
         const hasSol = Array.isArray(sol) ? sol.some((x) => x.trim()) : sol.trim();
         if (!rule.title && !hasSol) return null; // порожній
@@ -178,6 +180,7 @@
                     title: it && it.title,
                     solution: it && it.solution,
                     docs: it && it.docs,
+                    mp: m.marketplace ?? m.mp,
                 });
             })
             .filter(Boolean);
@@ -192,6 +195,7 @@
         const ix = {
             code: at('match_code'), msg: at('match_message'), rx: at('match_regex'),
             src: at('match_source'), title: at('title'), sol: at('solution'), docs: at('docs'),
+            mp: at('match_marketplace'),
         };
         const out = [];
         for (let i = 1; i < rows.length; i++) {
@@ -199,7 +203,7 @@
             const g = (k) => (ix[k] >= 0 ? String(r[ix[k]] ?? '') : '');
             const rule = toRule({
                 code: g('code'), msg: g('msg'), rx: g('rx'), src: g('src'),
-                title: g('title'), solution: g('sol'), docs: g('docs'),
+                title: g('title'), solution: g('sol'), docs: g('docs'), mp: g('mp'),
             });
             if (rule) out.push(rule);
         }
@@ -239,7 +243,7 @@
                         RULES_CACHE_KEY,
                         JSON.stringify({
                             ts: RULES_TS,
-                            rules: rules.map((r) => ({ code: r.code, msg: r.msg, rx: r.rx, src: r.src, title: r.title, solution: r.solution, docs: r.docs })),
+                            rules: rules.map((r) => ({ code: r.code, msg: r.msg, rx: r.rx, src: r.src, title: r.title, solution: r.solution, docs: r.docs, mp: r.mp })),
                         })
                     );
                 } catch (e) {}
@@ -272,6 +276,7 @@
             if (r.code && String(e.code ?? '') !== String(r.code)) continue;
             if (r.src && String(e.source ?? '').toLowerCase() !== r.src.toLowerCase()) continue;
             if (r.msg && !msg.toLowerCase().includes(r.msg.toLowerCase())) continue;
+            if (r.mp && (r.mp === '1') !== !!e.isMarketplace) continue; // невідомо → як звичайне замовлення
             let groups = {};
             if (r.rx) {
                 if (!r._re) continue;
@@ -321,9 +326,16 @@
 
     // Сторінка-дамп: <h2>Payload</h2><pre>…</pre><h2>Response</h2><pre>…</pre>
     function extractFromDump() {
-        const findings = [];
         const lines = [];
         [...document.querySelectorAll('pre')].filter(outsidePanel).forEach((pre) => lines.push(...preLines(pre)));
+        return parseDumpLines(lines);
+    }
+
+    // Чиста функція (без DOM): рядки Payload/Response → масив знахідок.
+    function parseDumpLines(lines) {
+        const findings = [];
+        let ext; // externalNumber замовлення ("29|470" — маркетплейс, "22411" — звичайне)
+        let mpTag = false; // "[GLOVO] delivery: …" у адресі
 
         for (const raw of lines) {
             if (typeof raw !== 'string') continue;
@@ -331,6 +343,13 @@
             const line = raw.replace(/^\d{4}-\d{2}-\d{2}T[\d:.]+Z\s*::\s*/, '');
             const jsonStr = (line.match(/\{[\s\S]*\}/) || [])[0];
             const obj = jsonStr ? safeJson(jsonStr) : null;
+
+            // контекст замовлення: номер і ознака маркетплейсу (з Payload / order-статусу)
+            if (obj) {
+                if (ext === undefined) ext = obj.externalNumber || (obj.orderInfo && obj.orderInfo.externalNumber) || undefined;
+                const st = obj.deliveryPoint && obj.deliveryPoint.address && obj.deliveryPoint.address.street && obj.deliveryPoint.address.street.name;
+                if (typeof st === 'string' && /^\s*\[[A-Za-z]+\]\s*delivery/i.test(st)) mpTag = true;
+            }
 
             // 1. Syrve: обʼєкт статусу замовлення ({creationStatus, errorInfo, order})
             if (obj && ('creationStatus' in obj || 'errorInfo' in obj || 'orderInfo' in obj)) {
@@ -358,9 +377,9 @@
                 const rm = o.resultMessage ? safeJson(o.resultMessage) : null;
                 findings.push({
                     source: o.name || 'HTTPError',
-                    code: rm && typeof rm.error === 'number' ? rm.error : undefined,
+                    code: rm && typeof rm.error === 'number' ? rm.error : typeof o.error === 'string' ? o.error : undefined,
                     httpCode: o.resultCode,
-                    message: (rm && rm.message) || o.code || line,
+                    message: (rm && rm.message) || o.errorDescription || o.code || line,
                     itemId: rm && (rm.item_id ?? rm.itemId),
                     raw: line,
                 });
@@ -368,14 +387,18 @@
             }
 
             // 3a. "[Poster] Cannot create receipt: <JSON або текст> [Table ID: …]."
-            m = line.match(/^\[([^\]]+)\]\s*Cannot create receipt:\s*([\s\S]+)$/i);
+            //     "[Syrve] Cannot create delivery: [corr-id] <текст> [400]."
+            m = line.match(/^\[([^\]]+)\]\s*Cannot create (?:receipt|delivery):\s*([\s\S]+)$/i);
             if (m) {
-                const body = m[2].replace(/\s*\[Table ID[^\]]*\]\.?\s*$/i, '').trim();
+                let body = m[2].replace(/\s*\[Table ID[^\]]*\]\.?\s*$/i, '').trim();
+                let http;
+                body = body.replace(/\s*\[(\d{3})\]\.?\s*$/, (_, c) => { http = c; return ''; });
+                body = body.replace(/^\[[0-9a-f-]{36}\]\s*/i, '').trim();
                 const o = safeJson((body.match(/\{[\s\S]*\}/) || [])[0] || '') || {};
                 findings.push({
                     source: m[1].trim(),
                     code: typeof o.error === 'number' ? o.error : undefined,
-                    httpCode: undefined,
+                    httpCode: http,
                     message: o.message || body,
                     itemId: o.item_id ?? o.itemId,
                     productId: o.product_id ?? o.productId,
@@ -416,6 +439,13 @@
                 });
             }
         }
+
+        // Контекст замовлення для всіх знахідок: № та чи це маркетплейс (Glovo/Wolt/Bolt).
+        const isMp = /\|/.test(String(ext ?? '')) || mpTag;
+        for (const f of findings) {
+            if (f.orderNumber === undefined) f.orderNumber = firstPart(ext);
+            f.isMarketplace = isMp;
+        }
         return dedupe(findings);
     }
 
@@ -440,7 +470,7 @@
             ((e.itemId ?? '') !== '' ? 1 : 0);
         const byKey = new Map();
         for (const e of arr) {
-            const k = (e.code ?? '') + '|' + (e.message || '');
+            const k = e.message || ''; // той самий текст з різних рядків дампа → одна знахідка
             const prev = byKey.get(k);
             if (!prev) { byKey.set(k, e); continue; }
             const merged = score(e) > score(prev) ? { ...prev, ...clean(e) } : { ...e, ...clean(prev) };
@@ -474,6 +504,7 @@
             groupName: q.get('cqr_group') || undefined,
             httpCode: q.get('cqr_http') || undefined,
             orderNumber: q.get('cqr_order') || undefined,
+            isMarketplace: q.get('cqr_mp') === '1',
             raw: 'ПРЕВʼЮ: ' + msg,
         }];
     }
@@ -498,6 +529,7 @@
         const cond = [
             r.code && `code = ${r.code}`,
             r.src && `source = ${r.src}`,
+            r.mp && `маркетплейс = ${r.mp === '1' ? 'так' : 'ні'}`,
             r.msg && `message містить «${r.msg}»`,
             r.rx && `regex: ${r.rx}`,
         ].filter(Boolean).join(' · ');

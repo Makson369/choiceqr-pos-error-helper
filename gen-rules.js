@@ -21,6 +21,8 @@ const rxSimpleModifier =
   'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
+const rxUndefinedGuid =
+  'Error converting value\\s+' + Q + '?undefined' + Q + '?\\s+to type\\s+' + Q + '?System\\.Guid' + Q + '?.*?productId';
 const rxParentGroupNotAllowed =
   'Cannot add product\\s+' + Q + '(?<name>' + NQ + '+)' + Q +
   '\\s*\\((?<pid>[0-9a-f-]{8,})\\)\\s*:\\s*it.s top parent group isn.t allowed for current department';
@@ -168,6 +170,22 @@ const RULES = [
       'POS ID: {pid}'
     ),
   },
+  {
+    match: { regex: rxUndefinedGuid, source: 'Syrve', marketplace: true },
+    title: 'Syrve: у позиції відсутній POS ID (маркетплейс)',
+    solution: L(
+      'Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].',
+      'Потрібно додати POS ID та виконати синхронізацію актуального меню для маркетплейсу.'
+    ),
+  },
+  {
+    match: { regex: rxUndefinedGuid, source: 'Syrve', marketplace: false },
+    title: 'Syrve: у позиції відсутній POS ID',
+    solution: L(
+      'Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].',
+      'Потрібно додати POS ID.'
+    ),
+  },
 ];
 
 const OUT = __dirname; // файли лежать поруч зі скриптом (D:\Claude\POS)
@@ -180,7 +198,7 @@ const csvCell = (v) => {
   v = String(v == null ? '' : v);
   return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
 };
-const csvRows = [['match_code', 'match_message', 'match_regex', 'match_source', 'title', 'solution', 'docs']];
+const csvRows = [['match_code', 'match_message', 'match_regex', 'match_source', 'title', 'solution', 'docs', 'match_marketplace']];
 for (const r of RULES) {
   csvRows.push([
     r.match.code ?? '',
@@ -190,6 +208,7 @@ for (const r of RULES) {
     r.title ?? '',
     Array.isArray(r.solution) ? r.solution.join('\n\n') : r.solution ?? '', // у CSV — одне поле
     r.docs ?? '',
+    r.match.marketplace === true ? 'true' : r.match.marketplace === false ? 'false' : '',
   ]);
 }
 const BOM = String.fromCharCode(0xfeff);

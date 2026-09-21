@@ -17,6 +17,11 @@ const rxInvalidGroupAmount =
   'Order item modifier\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+has invalid group amount:\\s*' +
   'min\\s*=\\s*(?<min>\\d+),\\s*max\\s*=\\s*(?<max>\\d+),\\s*actual\\s*=\\s*(?<actual>\\d+)';
+// Той самий "invalid group amount", але Syrve додає "in product “Назва” (id)" — назва позиції є в помилці.
+const rxInvalidGroupAmountInProduct =
+  'Order item modifier\\s+' + Q + '(?<mod>.+?)' + Q + '\\s*\\((?<modId>[0-9a-f-]{8,})\\)\\s+' +
+  'in product\\s+' + Q + '(?<item>.+?)' + Q + '\\s*\\((?<prodId>[0-9a-f-]{8,})\\)\\s+' +
+  'has invalid group amount:\\s*min\\s*=\\s*(?<min>\\d+),\\s*max\\s*=\\s*(?<max>\\d+),\\s*actual\\s*=\\s*(?<actual>\\d+)';
 const rxSimpleModifier =
   'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
   '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
@@ -185,6 +190,25 @@ const RULES = [
       'Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].',
       'Потрібно додати POS ID.'
     ),
+  },
+  {
+    match: { regex: rxInvalidGroupAmountInProduct, source: 'Syrve' },
+    title: 'Syrve: некоректна кількість вибору модифікатора (з назвою позиції)',
+    solution: [
+      L(
+        'Замовлення № {orderNumber}',
+        '',
+        'Повідомлення про помилку вказує, що виникли проблеми з модифікатором «{mod}» ({modId}) для позиції «{item}».',
+        '',
+        'Згідно з налаштуваннями Syrve — має бути мінімум {min} і максимум {max} доповнень цього набору, а в замовленні обрано {actual}.'
+      ),
+      L(
+        'Перевірте набір доповнень «{mod}» для цієї позиції в Syrve і Choice.',
+        '',
+        'Посилання на позицію: [посилання]',
+        '+ фото'
+      ),
+    ],
   },
 ];
 

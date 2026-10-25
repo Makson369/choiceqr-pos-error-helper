@@ -32,6 +32,9 @@ const rxUndefinedGuid =
 const rxParentGroupNotAllowed =
   'Cannot add product\\s+' + Q + '(?<name>.+?)' + Q +
   '\\s*\\((?<pid>[0-9a-f-]{8,})\\)\\s*:\\s*it.s top parent group isn.t allowed for current department';
+const rxNoCookingPlace =
+  'Product\\s+' + Q + '(?<name>.+?)' + Q +
+  '\\s*\\((?<pid>[0-9a-f-]{8,})\\)\\s+doesn.t have cooking place type';
 
 const L = (...a) => a.join('\n');
 
@@ -210,6 +213,19 @@ const RULES = [
         '+ фото'
       ),
     ],
+  },
+  {
+    match: { regex: rxNoCookingPlace, source: 'Syrve' },
+    title: 'Syrve: у позиції не вказано тип місця приготування',
+    solution: L(
+      'У позиції «{name}» в Syrve не вказано тип місця приготування, через що програма не має інформації,',
+      'з якого складу її списувати. Тому вона не може продаватись — ні через замовлення, ні напряму, якщо додати цю позицію вручну.',
+      '',
+      'Потрібно в Syrve відкрити позицію «{name}» → «Основні властивості» → заповнити поле «Тип місця приготування» і зберегти.',
+      '',
+      'POS ID: {pid}',
+      '+ фото'
+    ),
   },
 ];
 

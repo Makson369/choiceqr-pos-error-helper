@@ -9,9 +9,10 @@ const rxInactive =
   'Product\\s+' + Q + '?(?<name>.+?)' + Q + '?\\s*\\((?<pid>[0-9a-f-]{20,})\\)\\s+is inactive';
 const rxExcluded =
   'Product\\s+' + Q + '?(?<name>.+?)' + Q + '?\\s*\\((?<pid>[0-9a-f-]{20,})\\)\\s+is excluded from menu';
+// Назви можуть містити лапки (напр. 'Набір «КЛАСИКА»'), тому .+? до наступного якоря, а не NQ.
 const rxFixedGroup =
-  'Cannot find fixed group modifiers\\s+' + Q + '(?<group>' + NQ + '+)' + Q +
-  '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
+  'Cannot find fixed group modifiers\\s+' + Q + '(?<group>.+?)' + Q +
+  '\\s+in order item\\s+' + Q + '(?<item>.+?)' + Q +
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
 const rxInvalidGroupAmount =
   'Order item modifier\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
@@ -23,13 +24,13 @@ const rxInvalidGroupAmountInProduct =
   'in product\\s+' + Q + '(?<item>.+?)' + Q + '\\s*\\((?<prodId>[0-9a-f-]{8,})\\)\\s+' +
   'has invalid group amount:\\s*min\\s*=\\s*(?<min>\\d+),\\s*max\\s*=\\s*(?<max>\\d+),\\s*actual\\s*=\\s*(?<actual>\\d+)';
 const rxSimpleModifier =
-  'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>' + NQ + '+)' + Q +
-  '\\s+in order item\\s+' + Q + '(?<item>' + NQ + '+)' + Q +
+  'Cannot find fixed simple modifiers item\\s+' + Q + '(?<mod>.+?)' + Q +
+  '\\s+in order item\\s+' + Q + '(?<item>.+?)' + Q +
   '\\s*\\(Id\\s*=\\s*(?<id>[0-9a-f-]{8,})\\)';
 const rxUndefinedGuid =
   'Error converting value\\s+' + Q + '?undefined' + Q + '?\\s+to type\\s+' + Q + '?System\\.Guid' + Q + '?.*?productId';
 const rxParentGroupNotAllowed =
-  'Cannot add product\\s+' + Q + '(?<name>' + NQ + '+)' + Q +
+  'Cannot add product\\s+' + Q + '(?<name>.+?)' + Q +
   '\\s*\\((?<pid>[0-9a-f-]{8,})\\)\\s*:\\s*it.s top parent group isn.t allowed for current department';
 
 const L = (...a) => a.join('\n');

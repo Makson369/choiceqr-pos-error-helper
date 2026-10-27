@@ -227,6 +227,17 @@ const RULES = [
       'Де знаходиться поле: https://i.ibb.co/Dgs27XFT/image.png'
     ),
   },
+  {
+    match: { message: 'too small delivery date', source: 'Syrve' },
+    title: 'Syrve: замала дата доставки (перехід на зимовий час)',
+    solution: L(
+      'Скоріш за все це повʼязано з переходом на зимовий час, і тому виникла помилка [Syrve] Cannot create delivery: Too small delivery date.',
+      '',
+      'Перевірте, будь ласка, чи на касовому компʼютері в налаштуваннях Syrve змінився час на UTC +2.',
+      '',
+      'Всі ці налаштування чи зміни виконуються на стороні POS системи Syrve, тому зверніться, будь ласка, до них для вирішення.'
+    ),
+  },
 ];
 
 const OUT = __dirname; // файли лежать поруч зі скриптом (D:\Claude\POS)

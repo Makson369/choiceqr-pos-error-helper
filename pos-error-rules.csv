@@ -1,18 +1,18 @@
 ﻿match_code,match_message,match_regex,match_source,title,solution,docs,match_marketplace
 ,product id is undefined,,Poster,Poster: pos-id позиції не знайдено,"Poster не може знайти у своїй системі pos-id позиції (POS ID: {itemId}).
 
-До позиції [назва позиції] вказано неактуальний POS ID.
+До позиції «назва позиції» вказано неактуальний POS ID.
 Має бути: [актуальний pos-id]
 
 Посилання на позицію: [посилання]
 
 Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",,
-,required modification missing,,Poster,Poster: не додано обовʼязковий модифікатор,"У позиції [назва позиції] є обовʼязковий набір доповнень «{groupName}», але в Choice він не доданий - тому Poster не може обробити чек
+,required modification missing,,Poster,Poster: не додано обовʼязковий модифікатор,"У позиції «назва позиції» є обовʼязковий набір доповнень «{groupName}», але в Choice він не доданий - тому Poster не може обробити чек
 
 Ось це доповнення має бути обовʼязково до цієї позиції: [посилання на позицію з фото цього доповнення]
 
 Детальніше про вирішення помилок: https://choiceqr.notion.site/pos-2611788653438096a042db2ffb55eee2",,
-,product id is empty,,Poster,Poster: у позиції немає pos-id,"До позиції (назва позиції) відсутній POS ID
+,product id is empty,,Poster,Poster: у позиції немає pos-id,"До позиції «назва позиції» відсутній POS ID
 Ось цей POS ID має бути до цієї позиції: 
 
 Посилання на позицію:
@@ -35,7 +35,7 @@ POS ID: {pid}",,
 Це замовлення можна пробити вручну, а наступні перенесуться як зазвичай, якщо з мережею все добре 😊",,
 ,,"Order item modifier\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<mod>[^\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]+)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\((?<modId>[0-9a-f-]{8,})\)\s+has invalid group amount:\s*min\s*=\s*(?<min>\d+),\s*max\s*=\s*(?<max>\d+),\s*actual\s*=\s*(?<actual>\d+)",Syrve,Syrve: некоректна кількість вибору модифікатора,"Замовлення № {orderNumber}
 
-Повідомлення про помилку вказує, що виникли проблеми з модифікатором «{mod}» ({modId}) для позиції [назва позиції].
+Повідомлення про помилку вказує, що виникли проблеми з модифікатором «{mod}» ({modId}) для позиції «назва позиції».
 
 Згідно з налаштуваннями Syrve — має бути мінімум {min} і максимум {max} доповнень цього набору, а в замовленні обрано {actual}.
 
@@ -63,9 +63,9 @@ POS ID: {pid}",,
 або прибрати з меню Choice.
 
 POS ID: {pid}",,
-,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID (маркетплейс),"Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].
+,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID (маркетплейс),"Помилка повідомляє, що відсутній POS ID до позиції «назва позиції».
 Потрібно додати POS ID та виконати синхронізацію актуального меню для маркетплейсу.",,true
-,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID,"Помилка повідомляє, що відсутній POS ID до позиції [назва позиції].
+,,Error converting value\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?undefined[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?\s+to type\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?System\.Guid[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]?.*?productId,Syrve,Syrve: у позиції відсутній POS ID,"Помилка повідомляє, що відсутній POS ID до позиції «назва позиції».
 Потрібно додати POS ID.",,false
 ,,"Order item modifier\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<mod>.+?)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\((?<modId>[0-9a-f-]{8,})\)\s+in product\s+[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB](?<item>.+?)[\u0022\u0027\u2018\u2019\u201C\u201D\u00AB\u00BB]\s*\((?<prodId>[0-9a-f-]{8,})\)\s+has invalid group amount:\s*min\s*=\s*(?<min>\d+),\s*max\s*=\s*(?<max>\d+),\s*actual\s*=\s*(?<actual>\d+)",Syrve,Syrve: некоректна кількість вибору модифікатора (з назвою позиції),"Замовлення № {orderNumber}
 

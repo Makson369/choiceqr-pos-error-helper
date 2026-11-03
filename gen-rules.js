@@ -229,7 +229,7 @@ const RULES = [
   },
   {
     match: { message: 'too small delivery date', source: 'Syrve' },
-    title: 'Syrve: замала дата доставки (перехід на зимовий час)',
+    title: 'Що це у випадку з переходом на зимовий/літній час',
     solution: L(
       'Скоріш за все це повʼязано з переходом на зимовий час, і тому виникла помилка [Syrve] Cannot create delivery: Too small delivery date.',
       '',

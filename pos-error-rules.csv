@@ -84,7 +84,7 @@ POS ID: {pid}",,
 
 POS ID: {pid}
 Де знаходиться поле: https://i.ibb.co/Dgs27XFT/image.png",,
-,too small delivery date,,Syrve,Syrve: замала дата доставки (перехід на зимовий час),"Скоріш за все це повʼязано з переходом на зимовий час, і тому виникла помилка [Syrve] Cannot create delivery: Too small delivery date.
+,too small delivery date,,Syrve,Що це у випадку з переходом на зимовий/літній час,"Скоріш за все це повʼязано з переходом на зимовий час, і тому виникла помилка [Syrve] Cannot create delivery: Too small delivery date.
 
 Перевірте, будь ласка, чи на касовому компʼютері в налаштуваннях Syrve змінився час на UTC +2.
 

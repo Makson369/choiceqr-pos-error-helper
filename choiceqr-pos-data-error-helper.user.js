@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.9.0
+// @version      3.10.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -384,6 +384,25 @@
                     raw: line,
                 });
                 continue;
+            }
+
+            // 2b. Голий обʼєкт відповіді Poster без префікса:
+            //     {"httpError":true,"resultCode":422,"resultMessage":"{\"error\":210,\"message\":…,\"modification_group\":{…},\"product_id\":85}"}
+            if (obj && typeof obj.resultMessage === 'string') {
+                const rm = safeJson(obj.resultMessage);
+                if (rm && (typeof rm.error === 'number' || typeof rm.message === 'string')) {
+                    findings.push({
+                        source: 'Poster',
+                        code: typeof rm.error === 'number' ? rm.error : undefined,
+                        httpCode: obj.resultCode,
+                        message: rm.message || obj.resultMessage,
+                        itemId: rm.item_id ?? rm.itemId,
+                        productId: rm.product_id ?? rm.productId,
+                        groupName: rm.modification_group && rm.modification_group.name,
+                        raw: line,
+                    });
+                    continue;
+                }
             }
 
             // 3a. "[Poster] Cannot create receipt: <JSON або текст> [Table ID: …]."

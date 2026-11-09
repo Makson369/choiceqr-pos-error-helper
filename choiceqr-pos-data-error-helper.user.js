@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChoiceQR POS data — помічник з помилок
 // @namespace    https://choiceqr.com/
-// @version      3.10.0
+// @version      3.11.0
 // @description  Витягує помилку з Response на сторінці pos-data (Poster / Syrve) і показує праворуч панель з готовим рішенням. База рішень — зовнішній файл JSON/CSV (GitHub або Google-таблиця), оновлюється без правок скрипта.
 // @author       you
 // @match        https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/*
@@ -52,7 +52,7 @@
      *    source  — точне джерело ("Poster" / "Syrve" / "HTTPError"…)
      *  solution — рядок АБО масив рядків (кожен = окреме поле з кнопкою «Копіювати»).
      *             \n = новий рядок; підстановки {code} {message} {source} {itemId}
-     *             {productId} {groupName} {httpCode} + іменовані групи з regex.
+     *             {productId} {groupName} {modIds} {httpCode} + іменовані групи з regex.
      *  docs     — (опц.) URL, показується під полями як клікабельний футер.
      *  Перший збіг згори — виграє.
      * ─────────────────────────────────────────────────────────────── */
@@ -258,7 +258,7 @@
     /* ═══════════════════════════════════════════════════════════════
      *  Зіставлення помилки з правилом
      * ═══════════════════════════════════════════════════════════════ */
-    const KNOWN_KEYS = ['code', 'message', 'source', 'itemId', 'productId', 'groupName', 'httpCode', 'orderNumber'];
+    const KNOWN_KEYS = ['code', 'message', 'source', 'itemId', 'productId', 'groupName', 'modIds', 'httpCode', 'orderNumber'];
 
     function fillTemplate(str, ctx) {
         return String(str == null ? '' : str)
@@ -303,6 +303,12 @@
     // "2277|707" (номер + WOLT-суфікс) → "2277"; порожньо → undefined.
     function firstPart(s) {
         return s ? String(s).split('|')[0] : undefined;
+    }
+
+    // Poster "modification_ids":[104,105] → "104, 105"; немає → undefined.
+    function modIds(o) {
+        const v = o && (o.modification_ids ?? o.modificationIds);
+        return Array.isArray(v) ? v.join(', ') : v ?? undefined;
     }
 
     // Кожен запис у <pre> відділений <br> і є JSON-рядком у лапках. Розгортаємо.
@@ -381,6 +387,9 @@
                     httpCode: o.resultCode,
                     message: (rm && rm.message) || o.errorDescription || o.code || line,
                     itemId: rm && (rm.item_id ?? rm.itemId),
+                    productId: rm && (rm.product_id ?? rm.productId),
+                    groupName: rm && rm.modification_group && rm.modification_group.name,
+                    modIds: modIds(rm),
                     raw: line,
                 });
                 continue;
@@ -399,6 +408,7 @@
                         itemId: rm.item_id ?? rm.itemId,
                         productId: rm.product_id ?? rm.productId,
                         groupName: rm.modification_group && rm.modification_group.name,
+                        modIds: modIds(rm),
                         raw: line,
                     });
                     continue;
@@ -422,6 +432,7 @@
                     itemId: o.item_id ?? o.itemId,
                     productId: o.product_id ?? o.productId,
                     groupName: o.modification_group && o.modification_group.name,
+                    modIds: modIds(o),
                     raw: line,
                 });
                 continue;
@@ -443,6 +454,7 @@
                         itemId: o.item_id ?? o.itemId,
                         productId: o.product_id ?? o.productId,
                         groupName: o.modification_group && o.modification_group.name,
+                        modIds: modIds(o),
                         raw: line,
                     });
                     continue;

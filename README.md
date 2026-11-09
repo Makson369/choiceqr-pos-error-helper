@@ -34,7 +34,7 @@ Tampermonkey-скрипт для сторінки
     "source": "Poster"
   },
   "title": "Заголовок у панелі",
-  "solution": "Текст. \\n — новий рядок. Підстановки: {code} {message} {source}\n{itemId} {productId} {groupName} {httpCode} + іменовані групи з regex."
+  "solution": "Текст. \\n — новий рядок. Підстановки: {code} {message} {source}\n{itemId} {productId} {groupName} {modIds} {httpCode} + іменовані групи з regex."
 }
 ```
 

@@ -1,7 +1,6 @@
 # ChoiceQR POS data — помічник з помилок
 
-Tampermonkey-скрипт для сторінок
-`https://europe-west1-choiceqr.cloudfunctions.net/pos-data/...` і
+Tampermonkey-скрипт для сторінки
 `https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/...`.
 Витягує помилку POS (Poster / Syrve) з `Payload` / `Response`, зіставляє її з базою правил
 і показує праворуч панель із готовим текстом відповіді клієнту (кнопка копіювання на кожен блок).

@@ -1,7 +1,8 @@
 # ChoiceQR POS data — помічник з помилок
 
-Tampermonkey-скрипт для сторінки
-`https://europe-west1-choiceqr(-dev).cloudfunctions.net/pos-data/...`.
+Tampermonkey-скрипт для сторінок
+`https://europe-west1-choiceqr.cloudfunctions.net/pos-data/...` і
+`https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/...`.
 Витягує помилку POS (Poster / Syrve) з `Payload` / `Response`, зіставляє її з базою правил
 і показує праворуч панель із готовим текстом відповіді клієнту (кнопка копіювання на кожен блок).
 
@@ -77,8 +78,12 @@ Tampermonkey-скрипт для сторінки
 
 Або сирий шаблон правила без жодних підстановок: `?cqr_rule=<N>` (N — номер у списку нижче).
 
-Приклад (правило #9):
-`…/pos-data/CFD8F0A8-2809-4FF9-96C8-F78A11A3B78B?cqr_src=Syrve&cqr_preview=Cannot%20find%20fixed%20group%20modifiers%20'Syrups'%20in%20order%20item%20'Fluff%20Coffee'%20(Id%20%3D%205a85e337-4f23-4164-95c5-cdd501e22664)`
+Приклади (правило #9):
+
+- прев'ю з підстановками —
+  <https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/CFD8F0A8-2809-4FF9-96C8-F78A11A3B78B?cqr_src=Syrve&cqr_preview=Cannot%20find%20fixed%20group%20modifiers%20'Syrups'%20in%20order%20item%20'Fluff%20Coffee'%20(Id%20%3D%205a85e337-4f23-4164-95c5-cdd501e22664)>
+- сирий шаблон —
+  <https://europe-west1-choiceqr-dev.cloudfunctions.net/pos-data/CFD8F0A8-2809-4FF9-96C8-F78A11A3B78B?cqr_rule=9>
 
 ## Як додати нове правило
 
